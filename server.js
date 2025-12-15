@@ -1,7 +1,9 @@
 // npm run server
 import express from "express";
 import cors from "cors";
-
+import { connectDB } from "./config/db.js";
+import productRouter from "./routes/productRoute.js";
+import "dotenv/config.js";
 //app config
 const app = express();
 const port = 4000;
@@ -9,12 +11,22 @@ const port = 4000;
 // middleware
 app.use(express.json()); // - when every we get the request from frontend to backend that will be parsed using this json
 
-app.use(cors()) // - using this we can access the backend form any frontend
+app.use(cors()); // - using this we can access the backend form any frontend
 
-app.get("/", (req,res)=>{
-    res.send("Fertitrack API Working")
-})
+// db connection
+connectDB();
 
-app.listen(port,()=>{
-    console.log(`Server Strated on http://localhost:${port}`)
-})
+// API endpoint
+app.use("/api/product", productRouter);
+app.use("/images", express.static("uploads"));
+
+app.get("/", (req, res) => {
+    res.send("Fertitrack API Working");
+});
+
+app.listen(port, () => {
+    console.log(`Server Started on http://localhost:${port}`);
+});
+
+// mongodb+srv://Fertitrack:<db_password>@cluster0.fjj0l1y.mongodb.net/?appName=Cluster0
+// mongodb+srv://Fertitrack:<db_password>@cluster0.fjj0l1y.mongodb.net/?
