@@ -1,4 +1,3 @@
-import { log } from "console";
 import productModel from "../models/ProductModel.js";
 import fs from "fs";
 
