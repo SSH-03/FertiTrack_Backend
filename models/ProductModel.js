@@ -7,11 +7,11 @@ const productSchema = new mongoose.Schema({
     dose_measure: { type: String, required: true },
     unitprice: { type: Number, required: true },
     quantityType: { type: String, required: true },
-
     quantity: { type: Number, required: true },
     description: { type: String, required: true },
 });
 
-const productModel = mongoose.models.product || mongoose.model("product",productSchema)
+const productModel = mongoose.models.product || mongoose.model("product", productSchema);
 
-export default productModel     
+export default productModel;
+export { productSchema };
