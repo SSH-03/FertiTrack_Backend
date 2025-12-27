@@ -6,6 +6,7 @@ import productRouter from "./routes/productRoute.js";
 import "dotenv/config.js";
 import userRouter from "./routes/userRoute.js";
 import orderRouter from "./routes/orderRoute.js";
+import customerRouter from "./routes/customerRoute.js";
 
 //app config
 const app = express();
@@ -24,6 +25,7 @@ app.use("/api/product", productRouter);
 app.use("/images", express.static("uploads"));
 app.use("/api/user", userRouter);
 app.use("/api/order", orderRouter);
+app.use("/api/customer", customerRouter);
 
 app.get("/", (req, res) => {
     res.send("Fertitrack API Working");

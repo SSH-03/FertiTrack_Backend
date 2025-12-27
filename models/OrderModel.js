@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import { productSchema } from "./ProductModel.js";
+import { customerSchema } from "./CustomerModel.js";
 
 const paymentSchema = new mongoose.Schema(
     {
@@ -8,41 +9,45 @@ const paymentSchema = new mongoose.Schema(
         status: { type: String, default: "Pending" },
         date: { type: Date, default: Date.now },
     },
-    { _id: false }
+
+    { timestamps: true }
 );
 
-const orderScheme = new mongoose.Schema({
-    id: { type: Number, required: true },
-    orderId: { type: String, required: true },
-    userId: { type: String, required: true },
+const orderScheme = new mongoose.Schema(
+    {
+        id: { type: Number, required: true },
+        orderId: { type: String, required: true },
+        userId: { type: String, required: true },
 
-    customer: { type: Object, required: true },
+        customer: { type: customerSchema, required: true },
 
-    balance: { type: Number, required: true },
+        balance: { type: Number, required: true },
 
-    billingSummary: {
-        total: Number,
-        discountType: String,
-        discountAmount: Number,
-        finalTotal: Number,
+        billingSummary: {
+            total: Number,
+            discountType: String,
+            discountAmount: Number,
+            finalTotal: Number,
+        },
+
+        products: {
+            type: [productSchema],
+            required: true,
+        },
+
+        payments: {
+            type: [paymentSchema],
+            default: [],
+        },
+
+        status: { type: String, default: "Pending" },
+
+        ordercanceled: { type: Boolean, default: false },
+
+        date: { type: Date, default: Date.now },
     },
-
-    products: {
-        type: [productSchema],
-        required: true,
-    },
-
-    payments: {
-        type: [paymentSchema],
-        default: [],
-    },
-
-    status: { type: String, default: "Pending" },
-
-    ordercanceled: { type: Boolean, default: false },
-
-    date: { type: Date, default: Date.now },
-});
+    { timestamps: true }
+);
 
 const orderModel = mongoose.models.order || mongoose.model("order", orderScheme);
 
