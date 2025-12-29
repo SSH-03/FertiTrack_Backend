@@ -1,6 +1,25 @@
 import mongoose from "mongoose";
 import { productSchema } from "./ProductModel.js";
-import { customerSchema } from "./CustomerModel.js";
+
+
+const customerSchema = new mongoose.Schema(
+    {
+        name: {
+            type: String,
+            required: true,
+            trim: true,
+        },
+        phone: {
+            type: Number,
+            required: true,
+        },
+        village: {
+            type: String,
+            default: "",
+        },
+    },
+    { timestamps: true }
+);
 
 const paymentSchema = new mongoose.Schema(
     {

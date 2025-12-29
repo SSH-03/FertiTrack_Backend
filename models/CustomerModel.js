@@ -24,4 +24,3 @@ const customerModel =
     mongoose.models.customer || mongoose.model("customer", customerSchema);
 
 export default customerModel;
-export { customerSchema };
