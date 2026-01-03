@@ -2,7 +2,6 @@ import productModel from "../models/ProductModel.js";
 import fs from "fs";
 import path from "path";
 
-/* ================= ADD PRODUCT ================= */
 const addProduct = async (req, res) => {
     try {
         if (!req.file) {
@@ -28,7 +27,7 @@ const addProduct = async (req, res) => {
     }
 };
 
-/* ================= LIST PRODUCTS ================= */
+
 const listProduct = async (req, res) => {
     try {
         const products = await productModel.find({});
@@ -39,8 +38,7 @@ const listProduct = async (req, res) => {
     }
 };
 
-/* ================= UPDATE PRODUCT ================= */
-// UPDATE PRODUCT
+
 const updateProduct = async (req, res) => {
     try {
         const productId = req.params.id;
@@ -74,7 +72,6 @@ const updateProduct = async (req, res) => {
 };
 
 
-/* ================= DELETE PRODUCT ================= */
 const removeProduct = async (req, res) => {
     try {
         const product = await productModel.findById(req.params.id);
