@@ -1,6 +1,4 @@
 import mongoose from "mongoose";
-import { productSchema } from "./ProductModel.js";
-
 
 const customerSchema = new mongoose.Schema(
     {
@@ -21,15 +19,55 @@ const customerSchema = new mongoose.Schema(
     { timestamps: true }
 );
 
-const paymentSchema = new mongoose.Schema(
-    {
-        amount: { type: Number, required: true },
-        mode: { type: String, required: true },
-        status: { type: String, default: "Pending" },
-        date: { type: Date, default: Date.now },
-    },
 
-    { timestamps: true }
+const orderProductSchema = new mongoose.Schema(
+    {
+        productId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "product",
+            required: true,
+        },
+
+        name: { type: String, required: true },
+        image: { type: String }, // optional
+        description: { type: String }, // optional
+
+        orderQuantity: {
+            type: Number,
+            required: true,
+        },
+
+        orderQuantityType: {
+            type: String,
+            enum: ["g", "kg", "ton"],
+            required: true,
+        },
+
+        baseUnitPrice: {
+            type: Number,
+            required: true,
+        },
+
+        effectiveUnitPrice: {
+            type: Number,
+            required: true,
+        },
+
+        totalPrice: {
+            type: Number,
+            required: true,
+        },
+
+        next_dose: { type: Number },
+        dose_measure: {
+            type: String,
+            enum: ["day", "week", "month", "year"],
+        },
+
+        nextDoseDate: { type: Date },
+        nextDosePretty: { type: String },
+    },
+    { _id: false }
 );
 
 const orderScheme = new mongoose.Schema(
@@ -50,14 +88,18 @@ const orderScheme = new mongoose.Schema(
         },
 
         products: {
-            type: [productSchema],
+            type: [orderProductSchema],
             required: true,
         },
 
-        payments: {
-            type: [paymentSchema],
-            default: [],
-        },
+        payments: [
+            {
+                amount: Number,
+                mode: String,
+                status: String,
+                date: Date,
+            },
+        ],
 
         status: { type: String, default: "Pending" },
 
@@ -68,6 +110,7 @@ const orderScheme = new mongoose.Schema(
     { timestamps: true }
 );
 
-const orderModel = mongoose.models.order || mongoose.model("order", orderScheme);
+const orderModel =
+    mongoose.models.order || mongoose.model("order", orderScheme);
 
 export default orderModel;

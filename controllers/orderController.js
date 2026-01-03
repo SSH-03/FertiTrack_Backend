@@ -1,43 +1,86 @@
 import orderModel from "../models/OrderModel.js";
 // import userModel from "../models/UserModel.js";
+import productModel from "../models/ProductModel.js";
+
+const convertToKg = (value, type) => {
+    if (type === "g") return value / 1000;
+    if (type === "kg") return value;
+    if (type === "ton") return value * 1000;
+    throw new Error("Invalid quantity type");
+};
 
 const placeOrder = async (req, res) => {
-    const orders = await orderModel.find({});
-    let id;
-    if (orders.length > 0) {
-        let last_order_array = orders.slice(-1);
-        let last_order = last_order_array[0];
-        id = last_order.id + 1;
-    } else {
-        id = 1;
-    }
-
     try {
+        const lastOrder = await orderModel.findOne().sort({ id: -1 });
+        const id = lastOrder ? lastOrder.id + 1 : 1;
+
+        // Reduce stock
+        for (const item of req.body.products) {
+            const product = await productModel.findById(item.productId);
+
+            if (!product) {
+                return res.json({
+                    success: false,
+                    message: "Product not found",
+                });
+            }
+
+            const orderedKg = convertToKg(
+                item.orderQuantity,
+                item.orderQuantityType
+            );
+
+            const productKg = convertToKg(
+                product.quantity,
+                product.quantityType
+            );
+
+            if (orderedKg > productKg) {
+                return res.json({
+                    success: false,
+                    message: `Insufficient stock for ${product.name}`,
+                });
+            }
+
+            const remainingKg = productKg - orderedKg;
+
+            // convert back to product unit
+            if (product.quantityType === "g")
+                product.quantity = remainingKg * 1000;
+
+            if (product.quantityType === "kg") product.quantity = remainingKg;
+
+            if (product.quantityType === "ton")
+                product.quantity = remainingKg / 1000;
+
+            await product.save();
+        }
+
+        // Save order snapshot
         const newOrder = new orderModel({
-            id: id,
+            id,
             orderId: "FertiTrackOrder-" + id,
             userId: req.body.userId,
             customer: req.body.customer,
             balance: req.body.balance,
             billingSummary: req.body.billingSummary,
             products: req.body.products,
-            payments: req.body.payments,
-            status: req.body.status,
+            payments: req.body.payments || [],
+            status: req.body.status || "Pending",
         });
 
         await newOrder.save();
-        // it will save the order in our database
-        // after placing the order we should cler the user cart
-        // await userModel.findByIdAndUpdate(req.body.userId, { cartData: {} });
-        res.json({ success: true, message: "Order saved" });
+
+        res.json({ success: true, message: "Order saved successfully" });
     } catch (error) {
-        console.log(error);
-        res.json({ success: false, message: "Error" });
+        console.error(error);
+        res.json({ success: false, message: error.message });
     }
 };
 
+
 const listOrders = async (req, res) => {
-    // create logic to get all details of user details
+    
     try {
         const orders = await orderModel.find({});
         res.json({ success: true, data: orders.reverse() });
